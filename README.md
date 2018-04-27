@@ -21,10 +21,11 @@ cd ..
 cd opencv
 mkdir build
 cd build
-cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D WITH_TBB=ON -D WITH_QT=ON -D WITH_OPENGL=ON -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules -D BUILD_EXAMPLES=ON ..
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/opt/ros/kinetic -D WITH_TBB=ON -D WITH_QT=OFF -D WITH_OPENGL=ON -D WITH_CUDA=OFF -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules -D BUILD_EXAMPLES=OFF ..
 ~~~
-!! CUDAがない時は
- WITH_CUDA=OFF マクロを追加
+-D WITH_????のところは必要なものやプリインストされているソフトウェアに応じて変える  
+例えばCUDAを使う(OpenCL)ならWITH_CUDA=ON  
+CMakeList.txtに一覧がある。
 
 - compile
 nprocでコア数を確認。4コアなら
@@ -56,6 +57,6 @@ detector.trainModel(pc);
 ~~~
 Mat pcは6列N行の行列で、点の座標とその点の法線ベクトルからなる
 ~~~
- x,y,z,N<sub>x</sub>,N<sub>y</sub>,N<sub>z</sub>
+ x,y,z,Nx,Ny,Nz
 ~~~
 サンプルはPLYファイルから読み込むが、これなら直接Matを作れる。
