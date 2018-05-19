@@ -24,7 +24,7 @@ if(CMAKE_VERSION VERSION_LESS "2.8.11")
 endif()
 
 # Declare the executable target built from your sources
-add_executable(test test.cpp)
+add_executable(loadPly loadPly.cpp)
 
 # Link your application with OpenCV libraries
-target_link_libraries(test ${OpenCV_LIBS})
+target_link_libraries(loadPly ${OpenCV_LIBS})
