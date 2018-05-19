@@ -7,8 +7,8 @@ using namespace std;
 using namespace cv;
 using namespace ppf_match_3d;
 
-int main(int argc, char** argv){    
-	Mat pc=loadPLYSimple("Design2.ply",1);
+int main(int argc, char** argv){   
+	Mat pc=loadPLYSimple(argv[1],0);
 	for(int i=0;i<pc.rows;i++){
 		cout<<i<<") "<<pc.row(i)<<"\n";
 	}
