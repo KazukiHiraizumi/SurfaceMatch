@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>three.js webgl - PCD</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<style>
+	body {
+		font-family: Monospace;
+		background-color: #000000;
+		margin: 0px;
+		overflow: hidden;
+	}
+	#info {
+		color: #fff;
+		position: absolute;
+		top: 10px;
+		width: 100%;
+		text-align: center;
+		z-index: 100;
+		display:block;
+	}
+	a { color: #d14826 }
+	.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
+	.highlight { background:orange; color:#fff; }
+	span {
+		display: inline-block;
+		width: 60px;
+		float: left;
+		text-align: center;
+	}
+</style>
+<script src="jquery.min.js"></script>
+<script src="cawclient.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="info">
+</div>
+</body>
+
+<script src="../build/three.js"></script>
+<script src="../js/controls/TrackballControls.js"></script>
+<script src="../js/Detector.js"></script>
+<script src="../js/libs/stats.min.js"></script>
+
+<script>
+	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+//init
+	let scene = new THREE.Scene();
+	scene.background = new THREE.Color( 0x000000 );
+	let camera = new THREE.PerspectiveCamera( 50, window.innerWidth/window.innerHeight, 10, 300 );
+	camera.position.x = 0.4;
+	camera.position.z = -2;
+	camera.up.set(0,0,1);
+	let controls = new THREE.TrackballControls( camera );
+	controls.rotateSpeed = 2.0;
+	controls.zoomSpeed = 1;
+	controls.panSpeed = 0.2;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.minDistance = 0.3
+	controls.maxDistance = 500;
+	scene.add( camera );
+	let renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+	let container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	container.appendChild( renderer.domElement );
+	let stats = new Stats();
+	container.appendChild( stats.dom );
+	window.addEventListener( 'resize',function(){
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		controls.handleResize();
+	},false );
+	window.addEventListener('keypress',function(ev){
+		switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
+		case '+':
+			break;
+		case '-':
+			break;
+		case 'c':
+			material.color.setHex(Math.random()*0xffffff);
+			break;
+		}
+	});
+
+	let anim=0;
+	function animate(){
+		anim=requestAnimationFrame( animate );
+		controls.update();
+		renderer.render( scene, camera );
+		stats.update();
+	}
+
+//event
+	let ws=new WsShare("ws://localhost:5000",function(ws){
+		ws.port=function(port){
+			const sock=new WebSocket(ws.url+':'+port);
+			sock.binaryType='arraybuffer';
+			sock.onopen=function(){
+				console.log('//binary socket opened');
+			}
+			sock.onmessage=function(event){
+				let geometry=new THREE.BufferGeometry();
+				let position=new Float32Array(event.data);
+console.log('position:'+position.length);
+				geometry.addAttribute('position',new THREE.Float32BufferAttribute(position,3));
+//				geometry.addAttribute('color',new THREE.Float32BufferAttribute(color,3));
+				geometry.computeBoundingSphere();
+				let material=new THREE.PointsMaterial({size:0.5});
+//				material.color.setHex(Math.random()*0xffffff);
+				material.color.setHex(0xffffff);
+				let mesh=new THREE.Points(geometry,material);
+				scene.add(mesh);
+				let center=mesh.geometry.boundingSphere.center;
+				controls.target.set( center.x, center.y, center.z);
+console.log('center '+JSON.stringify(mesh.geometry.boundingSphere));
+				camera.position=center;
+				camera.position.z+=mesh.geometry.boundingSphere.radius*2;
+				controls.update();
+				if(anim==0) animate();
+			}
+		}
+	});
+</script>
+</html>
