@@ -11,7 +11,7 @@ setImmediate(async function(){
 		ros.log.error('Missing target topic name to subscribe');
 		return;
 	}
-	const rosNode=await ros.initNode('/plysvr');
+	const rosNode=await ros.initNode('/pclgate');
 	let sub=rosNode.subscribe(process.argv[2],sensor_msgs.PointCloud,async (pts)=>{
 		let mat=new Float32Array(pts.points.length*3);
 		for(let i=0;i<pts.points.length;i++){
